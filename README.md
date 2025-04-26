@@ -36,6 +36,8 @@ movie-recommender/
 ├── models/
 │   ├── movies.pkl             # Movie metadata
 │   └── similarity.pkl         # Similarity matrix
+├── recommender/
+│   ├── recommender.py             # recommendation 
 ├── auth/
 │   ├── db_utils.py            # User DB interactions
 │   ├── email_utils.py         # Email sending logic
