@@ -129,7 +129,10 @@ Major libraries used:
 
 ## 📸 Screenshot
 
-![Screenshot](https://via.placeholder.com/1000x600.png?text=Screenshot+of+Movie+Recommender+App)
+![Screenshot 2025-04-26 235926](https://github.com/user-attachments/assets/7f8978fa-5bb4-4ab2-8c36-4f043afa8d46)
+![Screenshot 2025-04-26 235840](https://github.com/user-attachments/assets/43f7b4b8-1203-4be1-8664-cab1b61a007a)
+
+
 
 ---
 
