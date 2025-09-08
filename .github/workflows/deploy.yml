@@ -6,7 +6,6 @@ on:
       - main
 
 jobs:
-
   deploy-on-ec2:
     name: Deploy Streamlit
     runs-on: ubuntu-latest
