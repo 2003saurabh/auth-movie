@@ -41,7 +41,7 @@ jobs:
                 git config --global --add safe.directory $(pwd)
            fi
 
-            cd /home/ec2-user/Image-Recognition/frontend
+            cd /home/ec2-user/auth-movie
             docker rm -f auth-movie-container || true
             docker build -t auth-movie .
             docker run --restart always -d -p 8501:8501 --name auth-movie-container auth-movie
