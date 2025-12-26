@@ -1,0 +1,108 @@
+@Library('shared') _
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'DOCKER_TAG', defaultValue: '', description: 'Docker image tag')
+    }
+
+    environment {
+        IMAGE_NAME = "movie-beta"
+        DOCKER_REPO = "saurabh8770"
+        CONTAINER_NAME = "movie-app"
+    }
+
+    stages {
+
+        stage("Validate Parameters") {
+            steps {
+                script {
+                    if (!params.DOCKER_TAG?.trim()) {
+                        error("DOCKER_TAG must be provided.")
+                    }
+                }
+            }
+        }
+
+        stage("Workspace Cleanup") {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Git: Code Checkout') {
+            steps {
+                git_checkout(
+                    "https://github.com/2003saurabh/auth-movie.git",
+                    "main"
+                )
+            }
+        }
+    stage('Git LFS: Pull large files') {
+    steps {
+        sh '''
+            git lfs pull
+        '''
+    }
+}
+
+        stage('Prepare env file') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'TMDB_API_KEY', variable: 'TMDB_API_KEY'),
+                    string(credentialsId: 'MONGO_URI', variable: 'MONGO_URI'),
+                    string(credentialsId: 'EMAIL_USER', variable: 'EMAIL_USER'),
+                    string(credentialsId: 'EMAIL_PASS', variable: 'EMAIL_PASS')
+                ]) {
+                    sh '''
+cat <<EOF > .env
+TMDB_API_KEY=$TMDB_API_KEY
+MONGO_URI=$MONGO_URI
+EMAIL_USER=$EMAIL_USER
+EMAIL_PASS=$EMAIL_PASS
+EOF
+'''
+                }
+            }
+        }
+
+        stage('Docker: Build Image') {
+            steps {
+                docker_build(
+                    env.IMAGE_NAME,
+                    params.DOCKER_TAG,
+                    env.DOCKER_REPO
+                )
+            }
+        }
+
+        stage("Docker: Push to DockerHub") {
+            steps {
+                docker_push(
+                    env.IMAGE_NAME,
+                    params.DOCKER_TAG,
+                    env.DOCKER_REPO
+                )
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                docker_deploy(
+                    env.IMAGE_NAME,          // deploy same image
+                    params.DOCKER_TAG,
+                    env.DOCKER_REPO,
+                    env.CONTAINER_NAME,
+                    "8501:8501",
+                    ".env"
+                )
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'rm -f .env'
+        }
+    }
+}
